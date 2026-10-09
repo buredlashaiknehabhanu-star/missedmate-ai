@@ -270,3 +270,42 @@ function downloadSummary() {
     }
     alert("📥 Downloading Summary:\n\n" + lastSummary);
 }
+import { pipeline } from '@xenova/transformers';
+
+const chatHistory = `
+[09:00] Alice: Hey team, we need to finalize the launch plan today. 
+[09:02] Bob: I'm still reviewing the marketing assets. The graphics look a bit off. 
+[09:05] Charlie: @Dave can you check the database cluster? It threw an out-of-memory error at midnight. 
+[09:15] Alice: @Bob let's fix the graphics by 3 PM. We can't delay the launch. 
+[09:18] Dave: @Charlie I checked the server. I restarted the node, but we need to upgrade the RAM by Friday to prevent it from happening again. 
+[09:22] Bob: @Alice sure, I will update the asset folder with new high-res versions by 2:30 PM. 
+[09:30] Charlie: Great, so Dave is upgrading RAM by Friday, and Bob is uploading new graphics by 2:30 PM today. Let's sync at 4 PM.
+`;
+
+async function runLocalAIAnalysis() { 
+  console.log("⏳ Initializing local AI pipeline...");
+
+  const generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B');
+
+  const prompt = `You are a local-first privacy-focused assistant. Analyze the chat log below and extract a structured summary.
+
+Strictly provide:
+- A brief 1-sentence overview.
+- A bulleted list of action items detailing who does what and by when.
+
+Chat Log:
+${chatHistory}
+
+Summary:`;
+
+  console.log("🧠 Analyzing chat data...");
+  const output = await generator(prompt, { 
+    max_new_tokens: 250, 
+    temperature: 0.2 
+  });
+
+  console.log("\n✨ ANALYSIS RESULT:\n");
+  console.log(output.generated_text);
+}
+
+runLocalAIAnalysis();
