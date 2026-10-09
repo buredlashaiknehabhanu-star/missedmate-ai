@@ -309,3 +309,5 @@ Summary:`;
 }
 
 runLocalAIAnalysis();
+node index.js
+
